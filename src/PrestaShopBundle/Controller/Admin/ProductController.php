@@ -622,6 +622,10 @@ class ProductController extends FrameworkBundleAdminController
             ->addExpectedInstanceClasses('PrestaShop\PrestaShop\Core\Product\ProductAdminDrawer')
             ->present();
 
+        $combinationsLimit = (isset($_POST['limit']) ? $_POST['limit'] : 20);
+        $combinationsOffset = (isset($_POST['offset']) ? $_POST['offset'] : 0);
+        $combinationLimitChoices = [20,50];
+
         return [
             'form' => $form->createView(),
             'formCombinations' => $formBulkCombinations->createView(),
@@ -648,6 +652,9 @@ class ProductController extends FrameworkBundleAdminController
             'editable' => $this->isGranted(PageVoter::UPDATE, self::PRODUCT_OBJECT),
             'drawerModules' => $drawerModules,
             'layoutTitle' => $this->trans('Product', 'Admin.Global'),
+            'combinationsLimit' => $combinationsLimit,
+            'combinationLimitChoices'   => $combinationLimitChoices,
+            'shown_ids_product_attribute' => (isset($formData['step3']['id_product_attributes']) ? implode(',', array_slice($formData['step3']['id_product_attributes'], $combinationsOffset, $combinationsLimit)) : ''),
         ];
     }
 
@@ -683,6 +690,16 @@ class ProductController extends FrameworkBundleAdminController
         );
 
         if (is_array($combinations)) {
+
+            if (isset($_POST['paginator-jump-page']) && isset($_POST['paginator-limit'])) {
+                $page = $_POST['paginator-jump-page'];
+                $limit = $_POST['paginator-limit'];
+                $offset = ($page - 1) * $limit;
+                $combinations = array_slice($combinations, $offset, $limit);
+            } else {
+                $combinations = array_slice($combinations, 0, 20);
+            }
+
             $maxInputVars = (int) ini_get('max_input_vars');
             $combinationsCount = count($combinations) * 25;
             $combinationsInputs = ceil($combinationsCount / 1000) * 1000;

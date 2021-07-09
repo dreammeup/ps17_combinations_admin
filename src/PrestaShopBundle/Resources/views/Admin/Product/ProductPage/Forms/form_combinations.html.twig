@@ -93,7 +93,7 @@
             <th colspan="3" class="text-sm-right">{{ 'Default combination'|trans({}, 'Admin.Catalog.Feature') }}</th>
           </tr>
         </thead>
-        <tbody class="js-combinations-list panel-group accordion" id="accordion_combinations" data-action-delete-all="{{ path('admin_delete_all_attributes', { 'idProduct': 1 }) }}" data-weight-unit="{{ 'PS_WEIGHT_UNIT'|configuration }}" data-action-refresh-images="{{ path('admin_get_form_images_combination', { 'idProduct': 1 }) }}"  data-id-product= {{ id_product }} data-ids-product-attribute="{{ ids_product_attribute }}" data-combinations-url="{{ path('admin_combination_generate_form', { 'combinationIds': ':numbers' }) }}">
+        <tbody class="js-combinations-list panel-group accordion" id="accordion_combinations" data-action-delete-all="{{ path('admin_delete_all_attributes', { 'idProduct': 1 }) }}" data-weight-unit="{{ 'PS_WEIGHT_UNIT'|configuration }}" data-action-refresh-images="{{ path('admin_get_form_images_combination', { 'idProduct': 1 }) }}"  data-id-product= {{ id_product }} data-ids-product-attribute="{{ shown_ids_product_attribute }}" data-all-ids-product-attribute="{{ ids_product_attribute }}" data-combinations-url="{{ path('admin_combination_generate_form', { 'combinationIds': ':numbers' }) }}">
           {% if has_combinations %}
             <tr class="combination loading timeline-wrapper" id="loading-attribute">
               <td class="timeline-item" width="1%">
@@ -121,6 +121,15 @@
         </tbody>
       </table>
     </div>
+
+  <div class="row justify-content-center" id="combinations-pagination" style="position:relative">
+      <svg style="display:none;width:100%;position:absolute;top:-100px;" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.0" width="80px" height="80px" viewBox="0 0 128 128" xml:space="preserve"><rect x="0" y="0" width="100%" height="100%" fill="#FFFFFF" /><g><path fill="#25b9d7" d="M109.25 55.5h-36l12-12a29.54 29.54 0 0 0-49.53 12H18.75A46.04 46.04 0 0 1 96.9 31.84l12.35-12.34v36zm-90.5 17h36l-12 12a29.54 29.54 0 0 0 49.53-12h16.97A46.04 46.04 0 0 1 31.1 96.16L18.74 108.5v-36z"/><animateTransform attributeName="transform" type="rotate" from="0 64 64" to="360 64 64" dur="1200ms" repeatCount="indefinite"></animateTransform></g></svg>
+      {{ include('@PrestaShop/Admin/Common/javascript_pagination.html.twig', {
+        'limit': combinationsLimit,
+        'limitChoices': combinationLimitChoices,
+      }) }}
+  </div>
+    
   </div>
 
   <div id="attributes-list" class="col-md-3">

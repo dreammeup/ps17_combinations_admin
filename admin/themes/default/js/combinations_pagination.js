@@ -30,8 +30,19 @@ function initPagination() {
         paginate(1);
     });
 
-    $('#js-bulk-combinations-total').bind('DOMSubtreeModified', function () {
-      $(selectorsMap.limitSelect).trigger('change');
+    $('#js-bulk-combinations-total').bind('DOMSubtreeModified', function (e) {
+        if (!isNaN(parseInt($('#js-bulk-combinations-total').text()))) {
+            setTimeout(function () {
+              ids_product_attribute = ids_product_attribute.filter(item => item);
+              $jsCombinationsList.find('tr').each(function() {
+                var new_combi = $(this).attr('data');
+                if (ids_product_attribute.indexOf(new_combi) === -1) {
+                  ids_product_attribute.push(new_combi);
+                }
+              });
+              paginate(1);
+          }, 200);
+        }
     });
 }
 
@@ -75,24 +86,24 @@ async function paginate(page) {
 
     // on affiche les bonnes déclinaisons
     var newUrl = getCombinationsUrl(offset,limit);
-    if (page != null) {
+    if (page != null && newUrl) {
         $jsCombinationsList.html('');
         showLoader();
         // on va chercher la nouvelle page
         $.ajax({
             method: 'GET',
             url: newUrl
-         }).done((response) => {
+        }).done((response) => {
             $jsCombinationsList.html(response);
             $.get(refreshImagesUrl).then(function(response) {
                 if (idsCount !== 0) {
                     refreshImagesCombination(response, ids_product_attribute.slice(offset, parseInt(offset)+parseInt(limit)));
                     $('#accordion_combinations tr').each(function() {
                         $(this).fadeIn(1000);
-                    })
+                    });
                     hideLoader();
                 }
-              });
+            });
         });
     }
 }
@@ -225,16 +236,15 @@ function getCombinationsUrl(offset, limit) {
 
 
 function refreshImagesCombination(combinationsImages, idsProductAttribute){
-$.each(idsProductAttribute, function (index, value) {
+    $.each(idsProductAttribute, function (index, value) {
         const $combinationElem = $('.combination[data="' + value + '"]');
         const $index = $combinationElem.attr('data-index');
         let $imagesElem = $combinationElem.find('.images');
         let html = '';
 
         if (0 === $imagesElem.length) {
-        $imagesElem = $('#combination_' + $index + '_id_image_attr');
+            $imagesElem = $('#combination_' + $index + '_id_image_attr');
         }
-
         $.each(combinationsImages[value], function(key, image) {
         html += `<div class="product-combination-image ${(image.id_image_attr ? 'img-highlight' : '')}">
             <input type="checkbox" name="combination_${$index}[id_image_attr][]" value="${image.id}" ${(image.id_image_attr ? 'checked="checked"' : '')}>
